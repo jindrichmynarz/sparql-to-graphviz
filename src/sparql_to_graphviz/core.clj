@@ -1,4 +1,5 @@
 (ns sparql-to-graphviz.core
+  "Summarizes data from a SPARQL endpoint into a list of classes with their properties."
   (:require [sparql-to-graphviz.sparql :as sparql]
             [sparql-to-graphviz.spec :as spec]
             [sparql-to-graphviz.util :as util]
@@ -32,14 +33,13 @@
         :ret (s/coll-of (s/keys :req [::spec/class ::spec/frequency]) :distinct true))
 (defn classes
   "Get absolute IRIs of instantiated classes."
-  ([]
-   (let [{:keys [min-support]} endpoint]
-     (if (zero? min-support)
-       (classes nil)
-       (let [instance-count (count-instances)
-             min-instances (int (* instance-count (/ min-support 100)))]
-         (classes min-instances)))))
-  ([min-instances]
+  ([min-support]
+   (if (zero? min-support)
+     (classes min-support nil)
+     (let [instance-count (count-instances)
+           min-instances (int (* instance-count (/ min-support 100)))]
+       (classes min-support min-instances))))
+  ([_ min-instances]
    (map (fn [{:keys [frequency]
               class-iri :class}]
           {::spec/class class-iri
@@ -47,18 +47,17 @@
         (sparql/select-template "classes.mustache" :data {:min-instances min-instances}))))
 
 (s/fdef class-properties
-        :args (s/cat :class-iri ::spec/iri)
+        :args (s/cat :class-iri ::spec/iri :min-support ::spec/min-support)
         :ret (s/coll-of ::spec/iri :distinct true))
 (defn class-properties
   "Get properties used with instances of `class-iri`."
-  ([class-iri]
-   (let [{:keys [min-support]} endpoint]
-     (if (zero? min-support)
-       (class-properties class-iri nil)
-       (let [instance-count (count-class-instances class-iri)
-             min-instances (int (* (/ min-support 100) instance-count))]
-         (class-properties class-iri min-instances)))))
-  ([class-iri min-instances]
+  ([class-iri min-support]
+   (if (zero? min-support)
+     (class-properties class-iri min-support nil)
+     (let [instance-count (count-class-instances class-iri)
+           min-instances (int (* (/ min-support 100) instance-count))]
+       (class-properties class-iri min-support min-instances))))
+  ([class-iri _ min-instances]
    (map :property 
         (sparql/select-template "class_properties.mustache" :data {:class class-iri
                                                                    :min-instances min-instances}))))
@@ -141,11 +140,11 @@
            :frequency (double (/ frequency total-frequency))})))
 
 (defn empirical-schema
-  []
+  [min-support]
   (for [{::spec/keys [frequency]
-         class-iri ::spec/class} (classes)]
+         class-iri ::spec/class} (classes min-support)]
     {:class class-iri
-     :properties (for [property (class-properties class-iri)
+     :properties (for [property (class-properties class-iri min-support)
                        :let [property-type (class-property-type class-iri property)
                              datatype-property? (= property-type (prefix/owl "DatatypeProperty"))
                              description {:property property

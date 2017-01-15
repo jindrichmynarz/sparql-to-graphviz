@@ -8,10 +8,10 @@
 
 (defn init-endpoint
   "Ping endpoint to test if it is up."
-  [{::spec/keys [endpoint graph min-support sleep]}]
+  [{::spec/keys [endpoint graph max-retries sleep]}]
   (try+ (client/head endpoint {:throw-entire-message? true})
         {:graph graph
-         :min-support min-support
+         :max-retries max-retries
          :sleep sleep
          :sparql-endpoint endpoint}
         (catch [:status 404] _
