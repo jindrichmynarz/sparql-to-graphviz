@@ -63,7 +63,7 @@
     :parse-fn io/as-file
     :default *out*
     :default-desc "STDOUT"]
-   [nil "--min-support MIN_SUPPORT" "Filter classes and properties by minimum percentage"
+   [nil "--min-support MIN_SUPPORT" "Filter classes and properties by minimum frequency in percent"
     :id ::spec/min-support
     :parse-fn util/->integer
     :validate [(partial s/valid? ::spec/min-support) "Percentage must be a number between 0 and 100."]
