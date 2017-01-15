@@ -57,7 +57,7 @@ For example, the resulting mess can look like this:
 
 ## Caveats
 
-* Classes identifier with blank nodes are ignored.
+* Classes identified with blank nodes are ignored. 
 
 ## License
 
