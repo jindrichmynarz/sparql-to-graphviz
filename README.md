@@ -20,7 +20,7 @@ WHERE {
 
 Yeah, me too.
 
-This tools helps to explore an unfamiliar dataset in a SPARQL endpoint, optionally restricted to a named graph. It produces a class diagram in the [DOT language](http://www.graphviz.org/doc/info/lang.html), which can be turned into images by [Graphviz](http://www.graphviz.org). The class diagram shows an *empirical schema* of the explored dataset. The schema reflects the structure of instance data in terms of its vocabularies. 
+This tools helps you to explore an unfamiliar dataset in a SPARQL endpoint, optionally restricted to a named graph. It produces a class diagram in the [DOT language](http://www.graphviz.org/doc/info/lang.html), which can be turned into images by [Graphviz](http://www.graphviz.org). The class diagram shows an *empirical schema* of the explored dataset. The schema reflects the structure of instance data in terms of its vocabularies. 
 
 If you want a more feature-rich and interactive visualization, give [LODSight](http://lod2-dev.vse.cz/lodsight-v2) a try.
 
