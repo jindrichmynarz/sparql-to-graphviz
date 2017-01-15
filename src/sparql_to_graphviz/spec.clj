@@ -45,6 +45,8 @@
 
 (s/def ::cardinality (s/keys :req [::min-cardinality ::max-cardinality]))
 
+(s/def ::max-retries (s/and int? pos?))
+
 (s/def ::min-support (s/and ::non-negative-number (partial >= 100)))
 
 (s/def ::output (s/or :file ::file

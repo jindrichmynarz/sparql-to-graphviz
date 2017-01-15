@@ -32,21 +32,32 @@
     (util/die (str "The provided arguments are invalid.\n\n"
                    (s/explain-str ::spec/config params)))))
 
+(defn class-diagram
+  "Generate class diagram of a dataset."
+  [min-support]
+  (let [schema (core/empirical-schema min-support)
+        ns-prefix-map (core/namespace-prefix-map (core/schema-terms schema))
+        compact-schema (core/compact-schema-iris ns-prefix-map schema)]
+    (graphviz/class-diagram compact-schema ns-prefix-map)))
+
+(defn save-diagram
+  "Save DOT `diagram` to `output`."
+  [output diagram]
+  (if (= output *out*)
+    (do (.write output class-diagram) (flush))
+    (with-open [writer (io/writer output)]
+      (.write writer class-diagram))))
+
 (defn- main
-  [{::spec/keys [endpoint output]
+  [{::spec/keys [endpoint min-support output]
     :as params}]
   (validate-params params)
   (try+ (mount/start-with-args params)
         (catch [:type ::util/endpoint-not-found] _
           (util/die (format "SPARQL endpoint <%s> was not found." endpoint))))
-  (let [schema (core/empirical-schema)
-        ns-prefix-map (core/namespace-prefix-map (core/schema-terms schema))
-        compact-schema (core/compact-schema-iris ns-prefix-map schema)
-        class-diagram (graphviz/class-diagram compact-schema ns-prefix-map)]
-    (if (= output *out*)
-      (do (.write output class-diagram) (flush))
-      (with-open [writer (io/writer output)]
-        (.write writer class-diagram)))))
+  (try+ (save-diagram output (class-diagram min-support))
+        (catch [:type ::util/endpoint-not-found] _
+          (util/die (format "SPARQL endpoint <%s> is hiding." endpoint)))))
 
 ; ----- Private vars -----
 
@@ -73,6 +84,11 @@
     :parse-fn util/->integer
     :validate [spec/non-negative? "Pause duration must be a non-negative number."]
     :default 0]
+   [nil "--max-retries MAX_RETRIES" "Number of attempts to retry a failed request"
+    :id ::spec/max-retries
+    :parse-fn util/->integer
+    :validate [spec/non-negative? "Number of retries must be a non-negative number."]
+    :default 3]
    ["-h" "--help" "Display help information"
     :id ::spec/help?]])
 

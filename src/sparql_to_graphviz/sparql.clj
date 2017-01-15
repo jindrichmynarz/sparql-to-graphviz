@@ -66,14 +66,18 @@
 
 (defn- execute-query
   "Execute SPARQL `query`."
-  [query]
-  (let [{:keys [sleep sparql-endpoint]} endpoint
+  [query & {:keys [retries]
+            :or {retries 0}}]
+  (let [{:keys [max-retries sleep sparql-endpoint]} endpoint
         params {:query-params {"query" query}
                 :throw-entire-message? true}]
     (when-not (zero? sleep) (Thread/sleep sleep)) 
     (try+ (:body (client/get sparql-endpoint params))
           (catch [:status 404] _
-            (throw+ {:type ::util/endpoint-not-found})))))
+            (if (< retries max-retries)
+              (do (Thread/sleep (+ (* retries 1000) 1000))
+                  (execute-query query :retries (inc retries)))
+              (throw+ {:type ::util/endpoint-not-found}))))))
 
 ; ----- Public functions -----
 
