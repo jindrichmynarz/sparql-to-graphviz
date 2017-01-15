@@ -51,6 +51,10 @@ target/sparql_to_graphviz -e http://localhost:8890/sparql |
 
 Give it some time, while it runs a boatload of SPARQL queries. When it finishes, `localhost.svg` should contain something beautiful. Exporting to SVG also allows you to make the visualization fancier using vector graphics tools.
 
+For example, the resulting mess can look like this:
+
+[https://github.com/jindrichmynarz/sparql-to-graphviz/blob/master/resources/vvz.png|alt=Example diagram]
+
 ## Caveats
 
 * Classes identifier with blank nodes are ignored.
