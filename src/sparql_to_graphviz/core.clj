@@ -175,7 +175,7 @@
 (defn namespaces
   "Get distinct namespaces from `schema-terms`."
   [schema-terms]
-  (distinct (map (comp first prefix/split-local-name) schema-terms)))
+  (distinct (remove nil? (map (comp first prefix/split-local-name) schema-terms))))
 
 (s/fdef most-frequent-namespace
         :args (s/cat :schema-terms (s/coll-of ::spec/iri))
@@ -185,6 +185,7 @@
   [schema-terms]
   (->> schema-terms
        (map (comp first prefix/split-local-name))
+       (remove nil?)
        frequencies
        (sort-by (comp - second))
        (map first)
@@ -224,8 +225,9 @@
 (defn compact-iri
   "Compact an `iri` using namespace-prefix mappings from `ns-prefix-map`."
   [ns-prefix-map iri]
-  (let [[ns-iri prefix] (first (filter (comp (partial string/starts-with? iri) first) ns-prefix-map))]
-    (str prefix \: (subs iri (count ns-iri)))))
+  (if-let [[ns-iri prefix] (first (filter (comp (partial string/starts-with? iri) first) ns-prefix-map))]
+    (str prefix \: (subs iri (count ns-iri)))
+    iri))
 
 (s/fdef compact-schema-iris
         :args (s/cat :ns-prefix-map (s/map-of ::spec/iri string?) :schema seq?))

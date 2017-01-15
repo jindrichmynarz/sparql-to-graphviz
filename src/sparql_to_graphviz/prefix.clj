@@ -1,6 +1,7 @@
 (ns sparql-to-graphviz.prefix
   (:require [clojure.java.io :as io]
             [clojure.set :refer [map-invert]]
+            [clojure.string :as string]
             [cheshire.core :as json]))
 
 ; ----- Namespace prefixes -----
@@ -21,8 +22,9 @@
 (defn split-local-name
   "Split `iri` into namespace and local name."
   [iri]
-  (let [[_ namespace-iri local-name] (re-matches #"^(.+[#/])(.+)$" iri)]
-    [namespace-iri local-name]))
+  (if-let [[_ namespace-iri local-name] (re-matches #"^(.+[#/])(.+)$" iri)]
+    [namespace-iri local-name]
+    [nil iri]))
 
 (defn prefix-conventions
   "Get conventional prefixes for namespaces from Prefix.cc."
