@@ -44,9 +44,9 @@
   "Save DOT `diagram` to `output`."
   [output diagram]
   (if (= output *out*)
-    (do (.write output class-diagram) (flush))
+    (do (.write output diagram) (flush))
     (with-open [writer (io/writer output)]
-      (.write writer class-diagram))))
+      (.write writer diagram))))
 
 (defn- main
   [{::spec/keys [endpoint min-support output]
