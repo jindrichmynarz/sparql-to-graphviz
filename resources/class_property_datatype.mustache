@@ -1,0 +1,29 @@
+{{!
+@param IRI class
+@param IRI graph
+@param IRI property
+}}
+
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT (COALESCE(?_datatype, xsd:string) AS ?datatype)
+WHERE {
+  {
+    SELECT ?_datatype (COUNT(?o) AS ?count)
+    WHERE {
+      {{#graph}}
+      GRAPH <{{.}}> {
+      {{/graph}}
+        [] a <{{class}}> ;
+          <{{property}}> ?o .
+        FILTER isLiteral(?o)
+        BIND (STR(DATATYPE(?o)) AS ?_datatype)
+      {{#graph}}
+      }
+      {{/graph}}
+    }
+    GROUP BY ?_datatype
+    ORDER BY DESC(?count)
+    LIMIT 1
+  }
+}

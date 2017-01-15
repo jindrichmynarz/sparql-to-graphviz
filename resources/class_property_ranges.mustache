@@ -1,0 +1,19 @@
+{{!
+@param IRI class
+@param IRI graph
+@param IRI property
+}}
+
+SELECT ?range (COUNT(DISTINCT ?s) AS ?frequency)
+WHERE {
+  {{#graph}}
+  GRAPH <{{.}}> {
+  {{/graph}}
+    ?s a <{{class}}> ;
+      <{{property}}> [ a ?range ] .
+    FILTER isIRI(?range)
+  {{#graph}}
+  }
+  {{/graph}}
+}
+GROUP BY ?range

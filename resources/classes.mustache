@@ -1,0 +1,21 @@
+{{!
+@param IRI graph
+@param int min-instances
+}}
+
+SELECT ?class (COUNT(?s) AS ?frequency)
+WHERE {
+  {{#graph}}
+  GRAPH <{{.}}> {
+  {{/graph}}
+    ?s a ?class .
+    FILTER isIRI(?class)
+  {{#graph}}
+  }
+  {{/graph}}
+}
+GROUP BY ?class
+{{#min-instances}}
+HAVING (COUNT(?s) >= {{.}})
+{{/min-instances}}
+ORDER BY DESC(?frequency)

@@ -1,0 +1,14 @@
+{{!
+@param IRI graph
+}}
+
+SELECT (COUNT(DISTINCT ?instance) AS ?count)
+WHERE {
+  {{#graph}}
+  GRAPH <{{.}}> {
+  {{/graph}}
+    ?instance a [] .
+  {{#graph}}
+  }
+  {{/graph}}
+}

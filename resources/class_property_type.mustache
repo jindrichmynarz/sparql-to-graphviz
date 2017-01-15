@@ -1,0 +1,31 @@
+{{!
+@param IRI class
+@param IRI graph
+@param IRI property
+}}
+
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+
+SELECT (IF(?countLiteral > ?countReferent, owl:DatatypeProperty, owl:ObjectProperty) AS ?propertyType)
+WHERE {
+  {
+    SELECT (COUNT(?literal) AS ?countLiteral)
+           (COUNT(?referent) AS ?countReferent)
+    WHERE {
+      {{#graph}}
+      GRAPH <{{.}}> {
+      {{/graph}}
+        ?s a <{{class}}> .
+        {
+          ?s <{{property}}> ?literal .
+          FILTER isLiteral(?literal) .
+        } UNION {
+          ?s <{{property}}> ?referent .
+          FILTER (!isLiteral(?referent))
+        }
+      {{#graph}}
+      }
+      {{/graph}}
+    }
+  }
+}

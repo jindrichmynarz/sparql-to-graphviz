@@ -1,0 +1,26 @@
+{{!
+@param IRI class
+@param IRI graph
+@param IRI property
+}}
+
+SELECT (MIN(?cardinality) AS ?minCardinality)
+       (MAX(?cardinality) AS ?maxCardinality)
+WHERE {
+  {
+    SELECT (COUNT(?o) AS ?cardinality)
+    WHERE {
+      {{#graph}}
+      GRAPH <{{.}}> {
+      {{/graph}}
+        ?s a <{{class}}> .
+        OPTIONAL {
+          ?s <{{property}}> ?o .
+        }
+      {{#graph}}
+      }
+      {{/graph}}
+    }
+    GROUP BY ?s
+  }
+}

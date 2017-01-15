@@ -1,0 +1,25 @@
+{{!
+@param IRI class
+@param IRI graph
+@param int min-instances
+}}
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+SELECT ?property (COUNT(DISTINCT ?s) AS ?frequency)
+WHERE {
+  {{#graph}}
+  GRAPH <{{.}}> {
+  {{/graph}}
+    ?s a <{{class}}> ;
+      ?property [] .
+    FILTER (!sameTerm(?property, rdf:type))
+  {{#graph}}
+  }
+  {{/graph}}
+}
+GROUP BY ?property
+{{#min-instances}}
+HAVING (COUNT(DISTINCT ?s) >= {{.}})
+{{/min-instances}}
+ORDER BY DESC(?frequency)
