@@ -53,7 +53,7 @@ Give it some time, while it runs a boatload of SPARQL queries. When it finishes,
 
 For example, the resulting mess can look like this:
 
-[[https://github.com/jindrichmynarz/sparql-to-graphviz/blob/master/resources/vvz.png|alt=Example diagram]]
+[[https://github.com/jindrichmynarz/sparql-to-graphviz/blob/master/resources/vvz.png|alt="Example diagram"]]
 
 ## Caveats
 
