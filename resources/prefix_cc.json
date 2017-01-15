@@ -134,7 +134,6 @@
   "type": "http://info.deepcarbon.net/schema/type#",
   "swrl": "http://www.w3.org/2003/11/swrl#",
   "swrlb": "http://www.w3.org/2003/11/swrlb#",
-  "dcterm": "http://purl.org/dc/terms/",
   "marcrel": "http://id.loc.gov/vocabulary/relators/",
   "sioct": "http://rdfs.org/sioc/types#",
   "drugbank": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/",
