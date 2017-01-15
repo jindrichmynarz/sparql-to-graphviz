@@ -9,14 +9,15 @@ SELECT (MIN(?cardinality) AS ?minCardinality)
        (MAX(?cardinality) AS ?maxCardinality)
 WHERE {
   {
-    SELECT ?s (COUNT(*) AS ?cardinality)
+    SELECT ?s (COUNT(DISTINCT ?o) AS ?cardinality)
     WHERE {
       {{#graph}}
       GRAPH <{{.}}> {
       {{/graph}}
         ?s a <{{class}}> .
         OPTIONAL {
-          ?s <{{property}}> [ a <{{range}}> ] .
+          ?s <{{property}}> ?o .
+          ?o a <{{range}}> .
         }
       {{#graph}}
       }
