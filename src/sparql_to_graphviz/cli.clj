@@ -68,7 +68,8 @@
                "The endpoint must be a valid absolute HTTP(S) URL."]]
    ["-g" "--graph GRAPH" "Restrict data to a named graph"
     :id ::spec/graph
-    :validate [spec/valid-url? "The graph must be a valid absolute IRI."]]
+    :validate [(some-fn spec/valid-url? spec/urn?)
+               "The graph must be either a valid absolute IRI or URN."]]
    ["-o" "--output OUTPUT" "Path to the output file"
     :id ::spec/output
     :parse-fn io/as-file

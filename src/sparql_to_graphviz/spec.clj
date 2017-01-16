@@ -13,6 +13,9 @@
 (def non-negative?
   (complement neg?))
 
+(def urn?
+  (partial re-matches #"(?i)^urn:[a-z0-9][a-z0-9-]{0,31}:[a-z0-9()+,\-.:=@;$_!*'%/?#]+$"))
+
 (def valid-url?
   "Test if `url` is valid."
   (let [validator (UrlValidator. UrlValidator/ALLOW_LOCAL_URLS)]
@@ -23,19 +26,22 @@
 
 (s/def ::curie (s/and string? curie?))
 
-(s/def ::iri valid-url?)
+(s/def ::iri (s/and string? valid-url?))
 
 (s/def ::non-negative-int (s/and int? non-negative?))
 
 (s/def ::non-negative-number (s/and number? non-negative?))
 
+(s/def ::urn (s/and string? urn?))
+
 (s/def ::class ::iri)
 
-(s/def ::endpoint (s/and string? http? ::iri))
+(s/def ::endpoint (s/and ::iri http?))
 
 (s/def ::frequency (s/and int? pos?))
 
-(s/def ::graph (s/and string? ::iri))
+(s/def ::graph (s/or :iri ::iri
+                     :urn ::urn))
 
 (s/def ::help? true?)
 
