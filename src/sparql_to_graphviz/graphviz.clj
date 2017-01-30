@@ -22,7 +22,7 @@
   {:point-size 14})
 
 (def ^:private to-key
-  (comp keyword util/sha1))
+  (comp keyword (partial str "k") util/sha1))
 
 (defn- property-selector
   [property-class]
