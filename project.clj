@@ -14,7 +14,13 @@
                  [mount "0.1.11"]
                  [commons-validator/commons-validator "1.5.1"]
                  [hiccup "1.0.5"]
-                 [dorothy "0.0.6"]]
+                 [dorothy "0.0.6"]
+                 [org.apache.jena/jena-arq "3.3.0"]
+                 [org.slf4j/slf4j-log4j12 "1.7.24"]
+                 [log4j/log4j "1.2.17" :exclusions [javax.mail/mail
+                                                    javax.jms/jms
+                                                    com.sun.jmdk/jmxtools
+                                                    com.sun.jmx/jmxri]]]
   :main sparql-to-graphviz.cli
   :profiles {:dev {:plugins [[lein-binplus "0.4.2"]]}
              :uberjar {:aot :all

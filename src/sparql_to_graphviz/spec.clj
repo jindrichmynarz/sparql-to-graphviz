@@ -2,7 +2,8 @@
   (:require [sparql-to-graphviz.prefix :as prefix]
             [clojure.spec :as s])
   (:import (java.io File Writer)
-           (org.apache.commons.validator.routines UrlValidator)))
+           (org.apache.commons.validator.routines UrlValidator)
+           (org.apache.jena.iri IRIFactory)))
 
 (def curie?
   (partial re-matches #"^[^:]*:[^:]+$"))
@@ -16,6 +17,13 @@
 (def urn?
   (partial re-matches #"(?i)^urn:[a-z0-9][a-z0-9-]{0,31}:[a-z0-9()+,\-.:=@;$_!*'%/?#]+$"))
 
+(def valid-iri?
+  "Test if `iri` is valid."
+  (let [iri-factory (IRIFactory/iriImplementation)]
+    (fn [iri]
+      (try (do (.construct iri-factory iri) true)
+           (catch Exception _ false)))))
+
 (def valid-url?
   "Test if `url` is valid."
   (let [validator (UrlValidator. UrlValidator/ALLOW_LOCAL_URLS)]
@@ -26,7 +34,7 @@
 
 (s/def ::curie (s/and string? curie?))
 
-(s/def ::iri (s/and string? valid-url?))
+(s/def ::iri (s/and string? valid-iri?))
 
 (s/def ::non-negative-int (s/and int? non-negative?))
 
