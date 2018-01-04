@@ -1,21 +1,6 @@
 (ns sparql-to-graphviz.endpoint
-  (:require [sparql-to-graphviz.util :as util]
-            [sparql-to-graphviz.spec :as spec]
-            [mount.core :as mount :refer [defstate]]
-            [clj-http.client :as client]
-            [clojure.string :as string]
-            [slingshot.slingshot :refer [try+ throw+]]))
-
-(defn init-endpoint
-  "Ping endpoint to test if it is up."
-  [{::spec/keys [endpoint graph max-retries sleep]}]
-  (try+ (client/head endpoint {:throw-entire-message? true})
-        {:graph graph
-         :max-retries max-retries
-         :sleep sleep
-         :sparql-endpoint endpoint}
-        (catch [:status 404] _
-          (throw+ {:type ::util/endpoint-not-found}))))
+  (:require [sparclj.core :refer [init-endpoint]]
+            [mount.core :as mount :refer [defstate]]))
 
 (defstate endpoint
   :start (init-endpoint (mount/args)))

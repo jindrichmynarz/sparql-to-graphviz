@@ -1,15 +1,12 @@
 (ns sparql-to-graphviz.spec
   (:require [sparql-to-graphviz.prefix :as prefix]
-            [clojure.spec :as s])
+            [sparclj.core :as sparql]
+            [clojure.spec.alpha :as s])
   (:import (java.io File Writer)
-           (org.apache.commons.validator.routines UrlValidator)
            (org.apache.jena.iri IRIFactory)))
 
 (def curie?
   (partial re-matches #"^[^:]*:[^:]+$"))
-
-(def http?
-  (partial re-matches #"^https?:\/\/.*$"))
 
 (def non-negative?
   (complement neg?))
@@ -24,12 +21,6 @@
       (try (do (.construct iri-factory iri) true)
            (catch Exception _ false)))))
 
-(def valid-url?
-  "Test if `url` is valid."
-  (let [validator (UrlValidator. UrlValidator/ALLOW_LOCAL_URLS)]
-    (fn [url]
-      (.isValid validator url))))
-
 (s/def ::file (partial instance? File))
 
 (s/def ::curie (s/and string? curie?))
@@ -43,8 +34,6 @@
 (s/def ::urn (s/and string? urn?))
 
 (s/def ::class ::iri)
-
-(s/def ::endpoint (s/and ::iri http?))
 
 (s/def ::frequency (s/and int? pos?))
 
@@ -70,7 +59,5 @@
 
 (s/def ::property-type #{(prefix/owl "DatytypeProperty") (prefix/owl "ObjectProperty")})
 
-(s/def ::sleep ::non-negative-int)
-
-(s/def ::config (s/keys :req [::endpoint ::output]
-                        :opt [::graph ::help? ::sleep]))
+(s/def ::config (s/keys :req [::sparql/url ::output]
+                        :opt [::graph ::help? ::sparql/max-retries ::sparql/sleep]))

@@ -4,9 +4,9 @@
             [sparql-to-graphviz.spec :as spec]
             [sparql-to-graphviz.util :as util]
             [sparql-to-graphviz.prefix :as prefix]
-            [sparql-to-graphviz.endpoint :refer [endpoint]]
-            [clojure.spec :as s]
-            [clojure.string :as string]))
+            [clojure.spec.alpha :as s]
+            [clojure.string :as string]
+            [slingshot.slingshot :refer [throw+]]))
 
 (s/fdef count-instances
         :ret ::spec/non-negative-int)
@@ -141,6 +141,7 @@
 
 (defn empirical-schema
   [min-support]
+  (when-not (sparql/ask-template "has_classes.mustache") (throw+ {:type ::util/no-classes}))
   (for [{::spec/keys [frequency]
          class-iri ::spec/class} (classes min-support)]
     {:class class-iri

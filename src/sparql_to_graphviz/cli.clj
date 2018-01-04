@@ -5,9 +5,10 @@
             [sparql-to-graphviz.endpoint :as endpoint]
             [sparql-to-graphviz.util :as util]
             [sparql-to-graphviz.graphviz :as graphviz]
+            [sparclj.core :as sparql]
             [clojure.tools.cli :refer [parse-opts]]
             [clojure.java.io :as io]
-            [clojure.spec :as s]
+            [clojure.spec.alpha :as s]
             [slingshot.slingshot :refer [try+]]
             [mount.core :as mount]))
 
@@ -53,23 +54,23 @@
     :as params}]
   (validate-params params)
   (try+ (mount/start-with-args params)
-        (catch [:type ::util/endpoint-not-found] _
+        (catch [:type ::sparql/endpoint-not-found] _
           (util/die (format "SPARQL endpoint <%s> was not found." endpoint))))
   (try+ (save-diagram output (class-diagram min-support))
-        (catch [:type ::util/endpoint-not-found] _
+        (catch [:type ::util/no-classes] _
+          (util/die "Cannot generate a diagram of a dataset without classes."))
+        (catch [:type ::sparql/endpoint-not-found] _
           (util/die (format "SPARQL endpoint <%s> is hiding." endpoint)))))
 
 ; ----- Private vars -----
 
 (def ^:private cli-options
   [["-e" "--endpoint ENDPOINT" "SPARQL endpoint's URL"
-    :id ::spec/endpoint
-    :validate [(every-pred spec/http? spec/valid-url?)
-               "The endpoint must be a valid absolute HTTP(S) URL."]]
+    :id ::sparql/url
+    :validate [(partial s/valid? ::sparql/url) "The endpoint must be a valid absolute HTTP(S) URL."]]
    ["-g" "--graph GRAPH" "Restrict data to a named graph"
     :id ::spec/graph
-    :validate [(some-fn spec/valid-iri? spec/urn?)
-               "The graph must be either a valid absolute IRI or URN."]]
+    :validate [(partial s/valid? ::spec/graph) "The graph must be either a valid absolute IRI or URN."]]
    ["-o" "--output OUTPUT" "Path to the output file"
     :id ::spec/output
     :parse-fn io/as-file
@@ -81,12 +82,12 @@
     :validate [(partial s/valid? ::spec/min-support) "Percentage must be a number between 0 and 100."]
     :default 0]
    [nil "--sleep SLEEP" "Number of miliseconds to pause between SPARQL requests"
-    :id ::spec/sleep
+    :id ::sparql/sleep
     :parse-fn util/->integer
     :validate [spec/non-negative? "Pause duration must be a non-negative number."]
     :default 0]
    [nil "--max-retries MAX_RETRIES" "Number of attempts to retry a failed request"
-    :id ::spec/max-retries
+    :id ::sparql/max-retries
     :parse-fn util/->integer
     :validate [spec/non-negative? "Number of retries must be a non-negative number."]
     :default 3]
