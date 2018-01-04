@@ -57,6 +57,7 @@ For example, the resulting mess can look like this:
 
 ## Caveats
 
+* If there are no instantiated classes, the program fails.
 * Classes identified with blank nodes are ignored. 
 
 ## License
