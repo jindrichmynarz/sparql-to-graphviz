@@ -1,0 +1,15 @@
+{{!
+@param IRI graph
+}}
+
+ASK
+WHERE {
+  {{#graph}}
+  GRAPH <{{.}}> {
+  {{/graph}}
+    [] a ?class .
+    FILTER isIRI(?class)
+  {{#graph}}
+  }
+  {{/graph}}
+}
